@@ -1,0 +1,6 @@
+rootProject.name = 'offer-tracker'
+include 'gratka'
+include 'utils'
+include 'common'
+include 'core'
+
