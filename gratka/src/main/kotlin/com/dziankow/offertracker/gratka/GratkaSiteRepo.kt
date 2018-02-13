@@ -64,7 +64,7 @@ class GratkaSiteRepo(urlSearchContext: String): SiteRepo("gratka", URL("http://d
                 }
             }
             else -> if (offerExternalLink.length > 0) {
-                val pattern = Pattern.compile("id=([0-9]*)")
+                val pattern = Pattern.compile("repoId=([0-9]*)")
                 val matcher = pattern.matcher(offerDescription)
                 if (matcher.find()) {
                     matcher.group(1)
@@ -92,7 +92,7 @@ class GratkaSiteRepo(urlSearchContext: String): SiteRepo("gratka", URL("http://d
         val offer = Offer(
                 name = offerName,
                 price = offerPrice,
-                id = offerNumber,
+                repoId = offerNumber,
                 externalId = offerExternalId,
                 description = offerDescription,
                 parameters = offerParameters,

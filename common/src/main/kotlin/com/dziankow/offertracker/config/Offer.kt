@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class Offer(
         val name: String,
         val price: Int,
-        val id: String,
+        val repoId: String,
         val externalId: String,
         val area: Double,
         val description: String,
@@ -23,7 +23,7 @@ data class Offer(
     override fun toString(): String {
         return "Offer(name='$name', " +
                 "price=${price}zł, " +
-                "id='$id', " +
+                "repoId='$repoId', " +
                 "externalId='$externalId', " +
                 "area=${area}m2, " +
                 "description='${description.substring(0, Math.min(description.length, 10))}...', " +
