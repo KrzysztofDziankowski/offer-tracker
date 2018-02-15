@@ -35,7 +35,6 @@ class DbModelsTest() {
 
     @Test
     fun offerModelTest() {
-
         logger.info("After Sucessfully insertion ")
         val offer1 = entityManagerUtil.saveEntity(getSimpleOffer("offerName1", "sellerName1"))
         val offer2 = entityManagerUtil.saveEntity(getSimpleOffer("offerName2", "sellerName2"))
