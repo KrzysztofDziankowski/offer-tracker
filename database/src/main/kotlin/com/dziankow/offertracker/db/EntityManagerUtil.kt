@@ -4,10 +4,15 @@ import com.dziankow.offertracker.db.model.EntityWithId
 import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
-class EntityManagerUtil (val persistenceUnitName: String = "file") {
+class EntityManagerUtil (val persistenceUnitName: String = "file", val fileName: String = "") {
 
     private val entityManagerFactory: EntityManagerFactory =
-            Persistence.createEntityManagerFactory(persistenceUnitName)
+            Persistence.createEntityManagerFactory(persistenceUnitName,
+                    if (fileName.length > 0)
+                        mapOf(Pair<String, String>("javax.persistence.jdbc.url", "jdbc:h2:$fileName"))
+                    else
+                        null
+            )
     private val entityManager = entityManagerFactory.createEntityManager()
 
 

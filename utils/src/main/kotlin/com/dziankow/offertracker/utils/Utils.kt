@@ -1,11 +1,24 @@
 package com.dziankow.offertracker.utils
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.jsoup.Jsoup
 import java.io.File
 import com.sun.xml.internal.ws.streaming.XMLStreamReaderUtil.close
 import java.io.FileOutputStream
+import java.nio.file.Files
+import java.nio.file.Path
 
 
+fun <T> loadFromFile(path: Path, clazz: Class<T>): T {
+    val mapper = ObjectMapper(YAMLFactory()) // Enable YAML parsing
+    mapper.registerModule(KotlinModule()) // Enable Kotlin support
+
+    return Files.newBufferedReader(path).use {
+        mapper.readValue(it, clazz)
+    }
+}
 
 fun getPage(searchUrl: String, timeout: Int): String {
     val doc = Jsoup.connect(searchUrl).timeout(timeout).get()

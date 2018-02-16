@@ -1,10 +1,21 @@
 package com.dziankow.offertracker.config
 
 import com.dziankow.offertracker.utils.getPage
+import com.dziankow.offertracker.utils.loadFromFile
 import com.dziankow.offertracker.utils.saveFile
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import java.io.File
 import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Path
 
-data class Config(val siteRepos: Collection<SiteRepo>)
+data class Config(val siteRepos: Collection<SiteRepo>, val databaseConfigDto: DatabaseConfigDto)
+
+fun loadConfig(file: File): ConfigDto {
+    return loadFromFile(file.toPath(), ConfigDto::class.java)
+}
 
 abstract class SiteRepo(val name: String,
                         val baseUrl: URL,

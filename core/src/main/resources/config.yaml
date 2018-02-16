@@ -1,4 +1,5 @@
 siteRepos:
   - gratka:
       "urlSearchContext": "mieszkania-sprzedam/lista/kujawsko-pomorskie,,4000000,co.html"
-
+database:
+  fileName: ~/.offertracker/offertracker2
