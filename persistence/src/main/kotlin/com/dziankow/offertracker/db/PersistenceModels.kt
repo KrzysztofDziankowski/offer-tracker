@@ -1,15 +1,17 @@
 package com.dziankow.offertracker.db
 
 import com.dziankow.offertracker.db.model.EntityWithId
+import org.slf4j.LoggerFactory
 import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
-internal class Persistence(val persistenceUnitName: String = "file", val fileName: String = "") {
+internal class PersistenceModels(val persistenceUnitName: String = "file", val fileName: String = "") {
 
+    private val logger = LoggerFactory.getLogger(PersistenceModels::class.java)
     private val entityManagerFactory: EntityManagerFactory =
             Persistence.createEntityManagerFactory(persistenceUnitName,
                     if (fileName.length > 0)
-                        mapOf(Pair<String, String>("javax.persistence.jdbc.url", "jdbc:h2:$fileName"))
+                        mapOf(Pair<String, String>("javax.persistence.jdbc.url", "jdbc:h2:$fileName"))//;TRACE_LEVEL_FILE=4;TRACE_LEVEL_SYSTEM_OUT=4"))
                     else
                         null
             )
@@ -17,6 +19,7 @@ internal class Persistence(val persistenceUnitName: String = "file", val fileNam
 
 
     fun <T : EntityWithId> saveEntity(entity: T): T {
+        logger.debug("saveEntity: {}", entity)
         try {
             entityManager.transaction.begin()
             val entityDb: T = entityManager.merge(entity)
@@ -29,6 +32,7 @@ internal class Persistence(val persistenceUnitName: String = "file", val fileNam
     }
 
     fun <T : EntityWithId> listEntities(clazz: Class<T>): List<T> {
+        logger.debug("listEntities (for {})", clazz.name)
         try {
             entityManager.transaction.begin()
             return entityManager.createQuery("from ${clazz.name}").resultList as List<T>
@@ -55,6 +59,7 @@ internal class Persistence(val persistenceUnitName: String = "file", val fileNam
 //}
 
     fun <T : EntityWithId> deleteEntity(id: Long, clazz: Class<T>) {
+        logger.debug("deleteEntity with id: {} (for {})", id, clazz.name)
         try {
             entityManager.transaction.begin()
             val offer = entityManager.find(clazz, id) as T

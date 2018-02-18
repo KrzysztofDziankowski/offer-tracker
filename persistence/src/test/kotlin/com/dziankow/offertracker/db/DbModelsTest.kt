@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 class DbModelsTest() {
 
     private val logger = LoggerFactory.getLogger(DbModelsTest::class.java)
-    private val persistence = Persistence("test")
+    private val persistence = PersistenceModels("test")
 
     fun getSimpleOfferEntity(offerName: String, sellerName: String): OfferEntity {
         val parameters = HashMap<String, String>()

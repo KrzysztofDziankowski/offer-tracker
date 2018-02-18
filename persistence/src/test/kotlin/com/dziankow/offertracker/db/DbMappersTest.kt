@@ -46,8 +46,8 @@ class DbMappersTest() {
         Assert.assertEquals(listOf(offer2), persistence.listOffers())
 
         logger.info("Update offer in DB")
-        val offer1Updated = persistence.saveOffer(offer1.copy(name = "offerName1Updated"))
-        persistence.saveOffer(offer1Updated)
-        Assert.assertEquals(listOf(offer1Updated), persistence.listOffers())
+        val offer2Updated = persistence.saveOffer(offer2.copy(name = "offerName1Updated"))
+        persistence.saveOffer(offer2Updated)
+        Assert.assertEquals(listOf(offer2Updated), persistence.listOffers())
     }
 }

@@ -2,7 +2,7 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
     <persistence-unit name="file" transaction-type="RESOURCE_LOCAL">
-        <class>com.dziankow.offertracker.db.model.Offer</class>
+        <class>com.dziankow.offertracker.db.model.OfferEntity</class>
         <class>com.dziankow.offertracker.db.model.SellerEntity</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />

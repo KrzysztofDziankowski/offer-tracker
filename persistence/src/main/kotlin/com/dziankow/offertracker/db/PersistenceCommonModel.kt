@@ -6,7 +6,7 @@ import com.dziankow.offertracker.db.model.OfferEntity
 
 class PersistenceCommonModel(val persistenceUnitName: String = "file", val fileName: String = "") {
 
-    private val persistence = com.dziankow.offertracker.db.Persistence(persistenceUnitName, fileName)
+    private val persistence = com.dziankow.offertracker.db.PersistenceModels(persistenceUnitName, fileName)
     private val mapper = Mappers()
 
 
