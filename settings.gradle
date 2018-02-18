@@ -2,6 +2,6 @@ rootProject.name = 'offer-tracker'
 include 'gratka'
 include 'utils'
 include 'common'
-include 'core'
-include 'database'
+include 'cli'
+include 'persistence'
 

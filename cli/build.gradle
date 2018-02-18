@@ -1,0 +1,8 @@
+dependencies {
+    compile project(":utils")
+    compile project(":gratka")
+    compile project(":common")
+    compile project(":persistence")
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
+}

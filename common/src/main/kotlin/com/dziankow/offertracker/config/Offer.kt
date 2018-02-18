@@ -1,9 +1,11 @@
 package com.dziankow.offertracker.config
 
 import com.dziankow.offertracker.utils.getAndSaveImage
+import jdk.nashorn.internal.codegen.OptimisticTypesPersistence
 import java.time.LocalDateTime
 
 data class Offer(
+        val persistenceId: Long? = null,
         val name: String,
         val price: Int,
         val repoId: String,
@@ -21,7 +23,9 @@ data class Offer(
 
 ) {
     override fun toString(): String {
-        return "Offer(name='$name', " +
+        return "Offer(" +
+                "persistenceId='$persistenceId', " +
+                "name='$name', " +
                 "price=${price}zł, " +
                 "repoId='$repoId', " +
                 "externalId='$externalId', " +
@@ -45,10 +49,11 @@ data class Offer(
 }
 
 data class Seller(
+        val persistenceId: Long? = null,
         val name: String,
         val html: String
 ) {
     override fun toString(): String {
-        return "Seller(name='$name')"
+        return "Seller(persistenceId=$persistenceId, name='$name')"
     }
 }

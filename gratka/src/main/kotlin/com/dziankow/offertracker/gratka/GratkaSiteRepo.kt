@@ -15,7 +15,7 @@ class GratkaSiteRepo(urlSearchContext: String): SiteRepo("gratka", URL("http://d
         val sellerHtml = doc.getElementById("dane-kontaktowe").html()
         val sellerName = doc.getElementById("dane-kontaktowe").getElementsByClass("nazwaFirmy").text()
 
-        val seller = Seller(sellerName, sellerHtml)
+        val seller = Seller(name = sellerName, html = sellerHtml)
 
         val offerDoc = doc.getElementById("dane-podstawowe")
         val offerDescription = offerDoc.getElementsByClass("opis").first().html()
