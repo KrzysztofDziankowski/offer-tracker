@@ -4,7 +4,7 @@ import com.dziankow.offertracker.config.Offer
 import com.dziankow.offertracker.db.model.Mappers
 import com.dziankow.offertracker.db.model.OfferEntity
 
-class PersistenceCommonModel(val persistenceUnitName: String = "file", val fileName: String = "") {
+class PersistenceCommonModel(val persistenceUnitName: String = "file", val fileName: String = ""): AutoCloseable {
 
     private val persistence = com.dziankow.offertracker.db.PersistenceModels(persistenceUnitName, fileName)
     private val mapper = Mappers()
@@ -20,5 +20,9 @@ class PersistenceCommonModel(val persistenceUnitName: String = "file", val fileN
 
     fun deleteOffer(id: Long) {
         persistence.deleteEntity(id, OfferEntity::class.java)
+    }
+
+    override fun close() {
+        persistence.close()
     }
 }

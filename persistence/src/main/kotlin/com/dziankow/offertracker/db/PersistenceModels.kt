@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import javax.persistence.EntityManagerFactory
 import javax.persistence.Persistence
 
-internal class PersistenceModels(val persistenceUnitName: String = "file", val fileName: String = "") {
+internal class PersistenceModels(val persistenceUnitName: String = "file", val fileName: String = ""): AutoCloseable {
 
     private val logger = LoggerFactory.getLogger(PersistenceModels::class.java)
     private val entityManagerFactory: EntityManagerFactory =
@@ -69,6 +69,10 @@ internal class PersistenceModels(val persistenceUnitName: String = "file", val f
             entityManager.transaction.rollback()
             throw e
         }
+    }
+
+    override fun close() {
+        entityManager.close()
     }
 
 }

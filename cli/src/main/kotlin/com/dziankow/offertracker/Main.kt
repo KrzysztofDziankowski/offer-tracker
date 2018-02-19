@@ -12,7 +12,7 @@ import kotlin.reflect.KFunction1
 class Main(private val config: Config) {
     private val logger = LoggerFactory.getLogger(Main::class.java)
 
-    private fun getPersistence() = PersistenceCommonModel(fileName = config.databaseConfigDto.fileName)
+    private fun getPersistenceCommonModel() = PersistenceCommonModel(fileName = config.databaseConfigDto.fileName)
     fun listOffers() {
         logger.info("listOffers")
         logger.info("{}", config)
@@ -24,10 +24,15 @@ class Main(private val config: Config) {
 //            println(clazz)
 //        }
 
-        val persistence = getPersistence()
-        for (offer in persistence.listOffers()) {
-            println(offer)
+        val persistence = getPersistenceCommonModel()
+        try {
+            for (offer in persistence.listOffers()) {
+                println(offer)
+            }
+        } finally {
+            persistence.close()
         }
+        logger.info("END - listOffers")
     }
 
     fun synchronizeOffers() {
@@ -42,11 +47,16 @@ class Main(private val config: Config) {
             offerList.addAll(siteRepo.getOffers())
         }
 
-        val persistence = getPersistence()
-        for (offer in offerList) {
-            logger.info("{}", offer)
-            persistence.saveOffer(offer)
+        val persistence = getPersistenceCommonModel()
+        try {
+            for (offer in offerList) {
+                logger.info("{}", offer)
+                persistence.saveOffer(offer)
+            }
+        } finally {
+            persistence.close()
         }
+        logger.info("END - synchronizeOffers")
     }
 }
 fun getConfig(configDto: ConfigDto): Config {
