@@ -46,18 +46,6 @@ internal class PersistenceModels(val persistenceUnitName: String = "file", val f
         }
     }
 
-//fun <T> updateEntity(id: Long, entity: T) {
-//    try {
-//        entityManager.transaction.begin()
-//        val student = entityManager.find(Student::class.java, studentId) as Student
-//        student.studentName = studentName
-//        entityManager.transaction.commit()
-//    } catch (e: Exception) {
-//        entityManager.transaction.rollback()
-//    }
-//
-//}
-
     fun <T : EntityWithId> deleteEntity(id: Long, clazz: Class<T>) {
         logger.debug("deleteEntity with id: {} (for {})", id, clazz.name)
         try {
@@ -73,6 +61,7 @@ internal class PersistenceModels(val persistenceUnitName: String = "file", val f
 
     override fun close() {
         entityManager.close()
+        entityManagerFactory.close()
     }
 
 }
