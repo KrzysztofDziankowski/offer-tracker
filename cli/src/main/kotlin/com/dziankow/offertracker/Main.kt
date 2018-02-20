@@ -26,9 +26,11 @@ class Main(private val config: Config) {
 
         val persistence = getPersistenceCommonModel()
         try {
-            for (offer in persistence.listOffers()) {
+            val offersInDb = persistence.listOffers()
+            for (offer in offersInDb) {
                 println(offer)
             }
+            logger.info("Count of offers in DB: {}", offersInDb.size)
         } finally {
             persistence.close()
         }
@@ -51,6 +53,15 @@ class Main(private val config: Config) {
         try {
             for (offer in offerList) {
                 logger.info("{}", offer)
+                val dbOffer = persistence.getOffer(offer.repoId, offer.externalId)
+                if (dbOffer.isPresent) {
+                    logger.info("Offer exists in DB (repoId: {}, externalId: {})", offer.repoId, offer.externalId)
+                    if (offer.contentEquals(dbOffer.get())) {
+                        logger.info("Offer with the same content (repoId: {}, externalId: {})", offer.repoId, offer.externalId)
+                        continue
+                    }
+                }
+                logger.info("Offer save in DB (repoId: {}, externalId: {})", offer.repoId, offer.externalId)
                 persistence.saveOffer(offer)
             }
         } finally {
