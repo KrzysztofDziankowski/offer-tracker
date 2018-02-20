@@ -4,14 +4,14 @@ import java.time.LocalDateTime
 import javax.persistence.*
 
 interface EntityWithId {
-        val id: Long?
+        val persistenceId: Long?
 }
 
 @Entity
 data class OfferEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        override val id: Long? = null,
+        override val persistenceId: Long? = null,
         val name: String = "",
         val price: Int = 0,
         val repoId: String = "",
@@ -37,7 +37,7 @@ data class OfferEntity(
 data class SellerEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
-        override val id: Long? = null,
+        override val persistenceId: Long? = null,
         val name: String = "",
         @Lob
         val html: String = ""

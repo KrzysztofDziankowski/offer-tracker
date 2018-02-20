@@ -8,21 +8,21 @@ class Mappers {
 
     fun mapToSeller(sellerEntity: SellerEntity) =
             Seller(
-                    persistenceId = sellerEntity.id,
+                    persistenceId = sellerEntity.persistenceId,
                     name = sellerEntity.name,
                     html = sellerEntity.html
             )
 
     fun mapToSellerEntity(seller: Seller) =
             SellerEntity(
-                    id = seller.persistenceId,
+                    persistenceId = seller.persistenceId,
                     name = seller.name,
                     html = seller.html
             )
 
     fun mapToOfferEntity(offer: Offer) =
             OfferEntity(
-                    id = offer.persistenceId,
+                    persistenceId = offer.persistenceId,
                     name = offer.name,
                     price = offer.price,
                     repoId = offer.repoId,
@@ -41,7 +41,7 @@ class Mappers {
 
     fun mapToOffer(offer: OfferEntity) =
             Offer(
-                    persistenceId = offer.id,
+                    persistenceId = offer.persistenceId,
                     name = offer.name,
                     price = offer.price,
                     repoId = offer.repoId,

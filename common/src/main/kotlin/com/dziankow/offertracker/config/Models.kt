@@ -4,6 +4,9 @@ import com.dziankow.offertracker.utils.getAndSaveImage
 import jdk.nashorn.internal.codegen.OptimisticTypesPersistence
 import java.time.LocalDateTime
 
+interface ContentComparable<T> {
+    fun contentEquals(other: T): Boolean
+}
 data class Offer(
         val persistenceId: Long? = null,
         val name: String,
@@ -21,7 +24,20 @@ data class Offer(
         val offerDir: String,
         val seller: Seller
 
-) {
+): ContentComparable<Offer> {
+    override fun contentEquals(other: Offer): Boolean {
+        return name == other.name
+                && price == other.price
+                && repoId == other.repoId
+                && externalId == other.externalId
+                && area == area
+                && description == other.description
+                && externalLink == other.externalLink
+//                && imageUrlList == other.imageUrlList
+                && html == other.html
+                && seller.contentEquals(other.seller)
+    }
+
     override fun toString(): String {
         return "Offer(" +
                 "persistenceId='$persistenceId', " +
@@ -52,7 +68,11 @@ data class Seller(
         val persistenceId: Long? = null,
         val name: String,
         val html: String
-) {
+): ContentComparable<Seller> {
+    override fun contentEquals(other: Seller): Boolean {
+        return name == other.name
+    }
+
     override fun toString(): String {
         return "Seller(persistenceId=$persistenceId, name='$name')"
     }
