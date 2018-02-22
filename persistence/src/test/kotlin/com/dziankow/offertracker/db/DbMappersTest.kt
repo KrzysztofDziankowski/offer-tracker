@@ -20,6 +20,7 @@ class DbMappersTest() {
         return Offer(
                 name = "offerName-$suffix",
                 price = 20000 + suffix,
+                repoName = "gratka",
                 repoId = "repoId-$suffix",
                 externalId = "externalId-$suffix",
                 area = 20.0,

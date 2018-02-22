@@ -92,6 +92,7 @@ class GratkaSiteRepo(urlSearchContext: String): SiteRepo("gratka", URL("http://d
         val offer = Offer(
                 name = offerName,
                 price = offerPrice,
+                repoName = repoName,
                 repoId = offerNumber,
                 externalId = offerExternalId,
                 description = offerDescription,

@@ -11,6 +11,7 @@ data class Offer(
         val persistenceId: Long? = null,
         val name: String,
         val price: Int,
+        val repoName: String,
         val repoId: String,
         val externalId: String,
         val area: Double,
@@ -29,6 +30,7 @@ data class Offer(
         return name == other.name
                 && price == other.price
                 && repoId == other.repoId
+                && repoName == other.repoName
                 && externalId == other.externalId
                 && area == area
                 && description == other.description
@@ -44,6 +46,7 @@ data class Offer(
                 "name='$name', " +
                 "price=${price}zł, " +
                 "repoId='$repoId', " +
+                "repoName='$repoName'" +
                 "externalId='$externalId', " +
                 "area=${area}m2, " +
                 "description='${description.substring(0, Math.min(description.length, 10))}...', " +

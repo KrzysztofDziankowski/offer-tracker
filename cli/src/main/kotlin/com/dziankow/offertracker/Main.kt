@@ -42,7 +42,7 @@ class Main(private val config: Config) {
         val offerList = ArrayList<Offer>()
 
         for (siteRepo in config.siteRepos) {
-            println("Loads offers for ${siteRepo.name}")
+            println("Loads offers for ${siteRepo.repoName}")
 //            offerList.addAll(siteRepo.getOffersWithImages())
             offerList.addAll(siteRepo.getOffers())
         }

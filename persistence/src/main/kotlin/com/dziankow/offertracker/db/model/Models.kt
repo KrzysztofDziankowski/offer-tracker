@@ -14,6 +14,7 @@ data class OfferEntity(
         override val persistenceId: Long? = null,
         val name: String = "",
         val price: Int = 0,
+        val repoName: String = "",
         val repoId: String = "",
         val externalId: String = "",
         val area: Double = 0.0,

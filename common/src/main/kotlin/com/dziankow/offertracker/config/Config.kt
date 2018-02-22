@@ -18,7 +18,7 @@ fun loadConfig(file: File): ConfigDto {
     return loadFromFile(file.toPath(), ConfigDto::class.java)
 }
 
-abstract class SiteRepo(val name: String,
+abstract class SiteRepo(val repoName: String,
                         val baseUrl: URL,
                         val urlSearchContext: String,
                         val timeout: Int = 30000) {
@@ -30,7 +30,7 @@ abstract class SiteRepo(val name: String,
     val searchFile: String
         get() {return "${dataDir}/search.html"}
     val dataDir: String
-        get() {return "data/${name}"}
+        get() {return "data/${repoName}"}
 
     abstract fun getOfferLinksFromPage(html: String): List<String>
     abstract fun offerFromPage(html: String, offerDir: String): Offer
@@ -60,6 +60,6 @@ abstract class SiteRepo(val name: String,
     }
 
     override fun toString(): String {
-        return "SiteRepo(name='$name', baseUrl=$baseUrl, urlSearchContext='$urlSearchContext', timeout=$timeout)"
+        return "SiteRepo(name='$repoName', baseUrl=$baseUrl, urlSearchContext='$urlSearchContext', timeout=$timeout)"
     }
 }
