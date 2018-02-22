@@ -6,6 +6,7 @@ import com.dziankow.offertracker.utils.saveFile
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
 import java.nio.file.Files
@@ -21,6 +22,8 @@ abstract class SiteRepo(val name: String,
                         val baseUrl: URL,
                         val urlSearchContext: String,
                         val timeout: Int = 30000) {
+
+    private val logger = LoggerFactory.getLogger(SiteRepo::class.java)
 
     val searchUrl: String
         get() {return "${baseUrl.toExternalForm()}/${urlSearchContext}"}
@@ -38,7 +41,7 @@ abstract class SiteRepo(val name: String,
         // just for debugging
         saveFile(searchFile, searchHtml)
         for (offerLink in getOfferLinksFromPage(searchHtml)) {
-            println(offerLink)
+            logger.info("Downloading offer: {}", offerLink)
             val offerName = offerLink.substringAfterLast("/")
             val offerHtml = getPage(offerLink, timeout)
             val offerDir = "$dataDir/$offerName"

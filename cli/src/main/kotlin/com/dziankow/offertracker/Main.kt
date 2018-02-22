@@ -6,16 +6,15 @@ import com.dziankow.offertracker.gratka.GratkaSiteRepo
 import org.apache.commons.cli.*
 import org.slf4j.LoggerFactory
 import java.io.File
-import kotlin.reflect.KFunction1
+import kotlin.reflect.KFunction2
 
 
 class Main(private val config: Config) {
-    private val logger = LoggerFactory.getLogger(Main::class.java)
-
     private fun getPersistenceCommonModel() = PersistenceCommonModel(fileName = config.databaseConfigDto.fileName)
-    fun listOffers() {
-        logger.info("listOffers")
-        logger.info("{}", config)
+
+    fun listOffers(verbose: Boolean) {
+        println("Listing offers...")
+        if (verbose) println(config)
 
 //        val reflections = Reflections("com.dziankow.offertracker")
 //        val classes = reflections.getSubTypesOf(SiteRepo::class.java)
@@ -27,49 +26,66 @@ class Main(private val config: Config) {
         val persistence = getPersistenceCommonModel()
         try {
             val offersInDb = persistence.listOffers()
-            for (offer in offersInDb) {
-                println(offer)
+            for (offerWithIndex in offersInDb.sortedBy { it.repoId }.withIndex()) {
+                printOffer(offerWithIndex, verbose)
             }
-            logger.info("Count of offers in DB: {}", offersInDb.size)
+            println("Count of offers in DB: ${offersInDb.size}")
         } finally {
             persistence.close()
         }
-        logger.info("END - listOffers")
     }
 
-    fun synchronizeOffers() {
-        logger.info("synchronizeOffers")
-        logger.info("{}", config)
+    fun synchronizeOffers(verbose: Boolean) {
+        println("Synchronizing offers...")
+        if (verbose) println(config)
 
         val offerList = ArrayList<Offer>()
 
         for (siteRepo in config.siteRepos) {
-            logger.info("Loads offers for {}", siteRepo.name)
+            println("Loads offers for ${siteRepo.name}")
 //            offerList.addAll(siteRepo.getOffersWithImages())
             offerList.addAll(siteRepo.getOffers())
         }
 
         val persistence = getPersistenceCommonModel()
+        var countOfUpdatedOffers = 0
+        var countOfNewOffers = 0
         try {
-            for (offer in offerList) {
-                logger.info("{}", offer)
-                val dbOffer = persistence.getOffer(offer.repoId, offer.externalId)
-                if (dbOffer.isPresent) {
-                    logger.info("Offer exists in DB (repoId: {}, externalId: {})", offer.repoId, offer.externalId)
-                    if (offer.contentEquals(dbOffer.get())) {
-                        logger.info("Offer with the same content (repoId: {}, externalId: {})", offer.repoId, offer.externalId)
+            for (offerWithIndex in offerList.sortedBy { it.repoId }.withIndex()) {
+                printOffer(offerWithIndex, verbose)
+                val dbOffer = persistence.getOffer(offerWithIndex.value.repoId, offerWithIndex.value.externalId)
+                val existsInDb = dbOffer.isPresent
+                if (existsInDb) {
+                    if (offerWithIndex.value.contentEquals(dbOffer.get())) {
                         continue
+                    } else {
+                        countOfUpdatedOffers++
                     }
+                } else {
+                    countOfNewOffers++
                 }
-                logger.info("Offer save in DB (repoId: {}, externalId: {})", offer.repoId, offer.externalId)
-                persistence.saveOffer(offer)
+                val msg = if (existsInDb) "already exists in DB but with different content" else "new offer"
+                println("* Save offer save in DB - $msg")
+                persistence.saveOffer(offerWithIndex.value)
             }
         } finally {
             persistence.close()
         }
-        logger.info("END - synchronizeOffers")
+        println("Count of offers in external repo: ${offerList.size}, old offers updated: ${countOfUpdatedOffers}, new offers: ${countOfNewOffers}")
+    }
+
+    private fun printOffer(offerWithIndex: IndexedValue<Offer>, verbose: Boolean) {
+        val offer = offerWithIndex.value
+        val index = offerWithIndex.index + 1
+        if (verbose) {
+            println("${index}) $offer")
+        } else {
+            val externalId = if (offer.externalId.length > 0) " (${offer.externalId})" else ""
+            println("${index}) ${offer.repoId}${externalId} - ${offer.name}, ${offer.area}m2, ${offer.price}zł")
+        }
     }
 }
+
 fun getConfig(configDto: ConfigDto): Config {
     val siteRepos = ArrayList<SiteRepo>()
     configDto.siteRepos.forEach {
@@ -91,7 +107,7 @@ enum class CliActionOptions(val opt: String,
                             val longOpt: String,
                             val hasArg: Boolean,
                             val description: String,
-                            val action: KFunction1<Main, Unit>) {
+                            val action: KFunction2<Main, @ParameterName(name = "verbose") Boolean, Unit>) {
     SYNCHRONIZE("s",
             "sync",
             false,
@@ -115,7 +131,11 @@ enum class CliOptions(val opt: String,
     CONFIG_FILE("c",
             "config",
             true,
-            "Configuration file.");
+            "Configuration file."),
+    VERBOSE("v",
+            "verbose",
+            false,
+            "Verbose output.");
 
     fun getOption(): Option {
         return Option(opt, longOpt, hasArg, description)
@@ -148,7 +168,7 @@ fun main(args: Array<String>) {
         val main = Main(config)
 
         CliActionOptions.values().filter { cmd.hasOption(it.opt) }.forEach {
-            it.action(main)
+            it.action(main, cmd.hasOption(CliOptions.VERBOSE.opt))
         }
     }
 }
