@@ -1,7 +1,22 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+
+mainClassName = "com.dziankow.offertracker.MainKt"
+
 dependencies {
     compile project(":utils")
-    compile project(":gratka")
     compile project(":common")
+    // TODO remove direct dependency
+    compile project(":gratka")
     compile project(":persistence")
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'

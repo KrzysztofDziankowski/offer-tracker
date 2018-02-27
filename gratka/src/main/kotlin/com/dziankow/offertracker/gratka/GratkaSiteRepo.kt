@@ -8,7 +8,7 @@ import org.jsoup.Jsoup
 import java.net.URL
 import java.util.regex.Pattern
 
-class GratkaSiteRepo(urlSearchContext: String): SiteRepo("gratka", URL("http://dom.gratka.pl"), urlSearchContext) {
+class GratkaSiteRepo(override var urlSearchContext: String = ""): SiteRepo("gratka", URL("http://dom.gratka.pl"), urlSearchContext) {
     override fun offerFromPage(html: String, offerDir: String): Offer {
         val doc = Jsoup.parse(html)
 

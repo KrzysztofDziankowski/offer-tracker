@@ -19,8 +19,8 @@ fun loadConfig(file: File): ConfigDto {
 }
 
 abstract class SiteRepo(val repoName: String,
-                        val baseUrl: URL,
-                        val urlSearchContext: String,
+                        open var baseUrl: URL,
+                        open var urlSearchContext: String,
                         val timeout: Int = 30000) {
 
     private val logger = LoggerFactory.getLogger(SiteRepo::class.java)

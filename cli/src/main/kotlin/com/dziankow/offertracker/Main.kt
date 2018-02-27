@@ -2,26 +2,26 @@ package com.dziankow.offertracker
 
 import com.dziankow.offertracker.config.*
 import com.dziankow.offertracker.db.PersistenceCommonModel
-import com.dziankow.offertracker.gratka.GratkaSiteRepo
+//import com.dziankow.offertracker.gratka.GratkaSiteRepo
 import org.apache.commons.cli.*
+import org.reflections.Reflections
 import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.reflect.KFunction2
+import org.reflections.vfs.Vfs.getFile
+import java.net.URLClassLoader
 
 
-class Main(private val config: Config) {
+
+
+class Main(private val configFile: File) {
+    private val config = getConfig(loadConfig(configFile))
+
     private fun getPersistenceCommonModel() = PersistenceCommonModel(fileName = config.databaseConfigDto.fileName)
 
     fun listOffers(verbose: Boolean) {
         println("Listing offers...")
         if (verbose) println(config)
-
-//        val reflections = Reflections("com.dziankow.offertracker")
-//        val classes = reflections.getSubTypesOf(SiteRepo::class.java)
-//
-//        for (clazz in classes) {
-//            println(clazz)
-//        }
 
         val persistence = getPersistenceCommonModel()
         try {
@@ -84,23 +84,37 @@ class Main(private val config: Config) {
             println("${index}) ${offer.repoId}${externalId} - ${offer.name}, ${offer.area}m2, ${offer.price}zł")
         }
     }
-}
+    fun getSiteRepoMap(): Map<String, Class<out SiteRepo>> {
+        val reflections = Reflections("com.dziankow.offertracker")
+        val classes = reflections.getSubTypesOf(SiteRepo::class.java)
+        return classes.associateBy { it.getConstructor().newInstance().repoName }
+    }
 
-fun getConfig(configDto: ConfigDto): Config {
-    val siteRepos = ArrayList<SiteRepo>()
-    configDto.siteRepos.forEach {
-        it.entries.forEach {
-            when (it.key) {
-                "gratka" -> {
-                    val urlSearchContext = it.value.get("urlSearchContext")
-                    if (urlSearchContext != null)
-                        siteRepos.add(GratkaSiteRepo(urlSearchContext))
+    fun test(verbose: Boolean) {
+        println("test")
+        if (verbose) println(config)
+
+    }
+    fun getConfig(configDto: ConfigDto): Config {
+        val siteRepoMap= getSiteRepoMap()
+        val siteRepos = ArrayList<SiteRepo>()
+        configDto.siteRepos.forEach {
+            it.entries.forEach { entry ->
+                if (siteRepoMap.containsKey(entry.key)) {
+                    val siteRepo = siteRepoMap.get(entry.key)?.getConstructor()?.newInstance() ?:
+                        throw IllegalArgumentException("Cannot create class for ${entry.key}")
+                    entry.value.keys.forEach {
+                        val methodName = "set${it[0].toUpperCase()}${it.subSequence(1, it.length)}"
+                        siteRepoMap.get(entry.key)?.getMethod(methodName, String::class.java)?.invoke(siteRepo, entry.value.get(it) ?: "")
+                    }
+                    siteRepos.add(siteRepo)
+                } else {
+                    throw IllegalArgumentException("Unknown siteRepo: ${entry.key}")
                 }
-                else -> throw IllegalArgumentException("Unknown siteRepo: ${it.key}")
             }
         }
+        return Config(siteRepos, configDto.database)
     }
-    return Config(siteRepos, configDto.database)
 }
 
 enum class CliActionOptions(val opt: String,
@@ -117,7 +131,12 @@ enum class CliActionOptions(val opt: String,
             "list",
             false,
             "List offers from DB.",
-            Main::listOffers);
+            Main::listOffers),
+    TEST("t",
+            "test",
+            false,
+            "Test",
+            Main::test);
 
     fun getOption(): Option {
         return Option(opt, longOpt, hasArg, description)
@@ -162,10 +181,7 @@ fun main(args: Array<String>) {
     if (!configFile.exists()) {
         println("Can not find config file ${configFile.absolutePath}")
     } else {
-
-        val config = getConfig(loadConfig(configFile))
-
-        val main = Main(config)
+        val main = Main(configFile)
 
         CliActionOptions.values().filter { cmd.hasOption(it.opt) }.forEach {
             it.action(main, cmd.hasOption(CliOptions.VERBOSE.opt))
