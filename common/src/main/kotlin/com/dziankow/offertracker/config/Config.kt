@@ -35,14 +35,13 @@ abstract class SiteRepo(val repoName: String,
     abstract fun getOfferLinksFromPage(html: String): List<String>
     abstract fun offerFromPage(html: String, offerDir: String): Offer
     abstract fun hasNextPage(html: String): Boolean
-    abstract fun getNextPageLink(html: String, urlContext: String): String
+    abstract fun getNextPageLink(html: String): String
 
-    fun getOffers(): List<Offer> {
+    private fun getOfferList(pageHtml: String, fileNameSuffix: String = ""): List<Offer> {
         val offerList = ArrayList<Offer>()
-        val searchHtml = getPage(searchUrl, timeout)
         // just for debugging
-        saveFile(searchFile, searchHtml)
-        for (offerLink in getOfferLinksFromPage(searchHtml)) {
+        saveFile(searchFile + fileNameSuffix, pageHtml)
+        for (offerLink in getOfferLinksFromPage(pageHtml)) {
             logger.info("Downloading offer: {}", offerLink)
             val offerName = offerLink.substringAfterLast("/")
             val offerHtml = getPage(offerLink, timeout)
@@ -51,6 +50,20 @@ abstract class SiteRepo(val repoName: String,
             saveFile("$offerDir/$offerName", offerHtml)
             val offer = offerFromPage(offerHtml, offerDir)
             offerList.add(offer)
+        }
+        return offerList
+    }
+
+    fun getOffers(): List<Offer> {
+        var searchHtml = getPage(searchUrl, timeout)
+        val offerList: MutableList<Offer> = ArrayList<Offer>()
+
+        offerList.addAll(getOfferList(searchHtml))
+        var i = 0
+        while(hasNextPage(searchHtml)) {
+            searchHtml = getPage(getNextPageLink(searchHtml), timeout)
+            offerList.addAll(getOfferList(searchHtml, "$i"))
+            i++
         }
         return offerList;
     }

@@ -82,6 +82,6 @@ internal class GratkaSiteRepoTest {
 
         assertTrue(siteRepo.hasNextPage(offerSearchHtml))
         assertEquals("http://dom.gratka.pl/mieszkania-sprzedam/lista/kujawsko-pomorskie,,40,2,li,s.html",
-                siteRepo.getNextPageLink(offerSearchHtml, "/mieszkania-sprzedam/lista/"))
+                siteRepo.getNextPageLink(offerSearchHtml))
     }
 }
