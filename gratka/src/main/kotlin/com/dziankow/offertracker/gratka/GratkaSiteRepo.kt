@@ -9,6 +9,17 @@ import java.net.URL
 import java.util.regex.Pattern
 
 class GratkaSiteRepo(override var urlSearchContext: String = ""): SiteRepo("gratka", URL("http://dom.gratka.pl"), urlSearchContext) {
+    override fun hasNextPage(html: String): Boolean {
+        val doc = Jsoup.parse(html)
+        return doc.getElementsByClass("stronaNastepna").first() != null
+    }
+
+    override fun getNextPageLink(html: String, urlContext: String): String {
+        val doc = Jsoup.parse(html)
+        val href = doc.getElementsByClass("stronaNastepna").first()?.getElementsByTag("a")?.first()?.attr("href")
+        return "${baseUrl.toExternalForm()}${urlContext}${href}"
+    }
+
     override fun offerFromPage(html: String, offerDir: String): Offer {
         val doc = Jsoup.parse(html)
 

@@ -34,6 +34,8 @@ abstract class SiteRepo(val repoName: String,
 
     abstract fun getOfferLinksFromPage(html: String): List<String>
     abstract fun offerFromPage(html: String, offerDir: String): Offer
+    abstract fun hasNextPage(html: String): Boolean
+    abstract fun getNextPageLink(html: String, urlContext: String): String
 
     fun getOffers(): List<Offer> {
         val offerList = ArrayList<Offer>()

@@ -1,5 +1,6 @@
 package com.dziankow.offertracker.gratka
 
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -48,8 +49,39 @@ internal class GratkaSiteRepoTest {
     fun getOfferLinks() {
         val offerSearchHtml = File(siteRepo.searchFile).bufferedReader().use { it.readText() }
 
-        for (offerLink in siteRepo.getOfferLinksFromPage(offerSearchHtml)) {
+        val offerLinks = siteRepo.getOfferLinksFromPage(offerSearchHtml)
+        for (offerLink in offerLinks) {
             println(offerLink)
         }
+
+        assertEquals(5, offerLinks.size);
+    }
+
+    @Test
+    fun getOfferLinks2() {
+        val offerSearchHtml = File("${siteRepo.dataDir}/search_with_pagination.html").bufferedReader().use { it.readText() }
+
+        val offerLinks = siteRepo.getOfferLinksFromPage(offerSearchHtml)
+        for (offerLink in offerLinks) {
+            println(offerLink)
+        }
+
+        assertEquals(40, offerLinks.size);
+    }
+
+
+    @Test
+    fun getNextPage() {
+        val offerSearchHtml = File("${siteRepo.dataDir}/search.html").bufferedReader().use { it.readText() }
+
+        assertFalse(siteRepo.hasNextPage(offerSearchHtml))
+    }
+    @Test
+    fun getNextPage2() {
+        val offerSearchHtml = File("${siteRepo.dataDir}/search_with_pagination.html").bufferedReader().use { it.readText() }
+
+        assertTrue(siteRepo.hasNextPage(offerSearchHtml))
+        assertEquals("http://dom.gratka.pl/mieszkania-sprzedam/lista/kujawsko-pomorskie,,40,2,li,s.html",
+                siteRepo.getNextPageLink(offerSearchHtml, "/mieszkania-sprzedam/lista/"))
     }
 }
