@@ -7,9 +7,11 @@ import java.time.LocalDateTime
 interface ContentComparable<T> {
     fun contentEquals(other: T): Boolean
 }
+
 data class Offer(
         val persistenceId: Long? = null,
         val name: String,
+        val offerInRepo: Boolean,
         val price: Int,
         val repoName: String,
         val repoId: String,

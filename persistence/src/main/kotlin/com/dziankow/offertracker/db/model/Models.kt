@@ -13,6 +13,7 @@ data class OfferEntity(
         @GeneratedValue(strategy = GenerationType.AUTO)
         override val persistenceId: Long? = null,
         val name: String = "",
+        val offerInRepo: Boolean = false,
         val price: Int = 0,
         val repoName: String = "",
         val repoId: String = "",

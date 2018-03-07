@@ -24,6 +24,7 @@ class Mappers {
             OfferEntity(
                     persistenceId = offer.persistenceId,
                     name = offer.name,
+                    offerInRepo = offer.offerInRepo,
                     price = offer.price,
                     repoName = offer.repoName,
                     repoId = offer.repoId,
@@ -44,6 +45,7 @@ class Mappers {
             Offer(
                     persistenceId = offer.persistenceId,
                     name = offer.name,
+                    offerInRepo = offer.offerInRepo,
                     price = offer.price,
                     repoName = offer.repoName,
                     repoId = offer.repoId,

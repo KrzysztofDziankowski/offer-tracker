@@ -9,7 +9,7 @@ import org.jsoup.Jsoup
 import java.net.URL
 import java.util.regex.Pattern
 
-class GratkaSiteRepo(override var urlSearchContext: String = ""): SiteRepo("gratka", URL("http://dom.gratka.pl"), urlSearchContext) {
+class GratkaSiteRepo(override var urlSearchContext: String = "", var baseUrlStr: String = "https://gratka.pl"): SiteRepo("gratka", URL(baseUrlStr), urlSearchContext) {
     override fun hasNextPage(html: String): Boolean {
         val doc = Jsoup.parse(html)
         return doc?.getElementsByClass("stronaNastepna")?.first() != null
@@ -125,6 +125,7 @@ class GratkaSiteRepo(override var urlSearchContext: String = ""): SiteRepo("grat
 
         val offer = Offer(
                 name = offerName,
+                offerInRepo = true,
                 price = offerPrice,
                 repoName = repoName,
                 repoId = offerNumber,
