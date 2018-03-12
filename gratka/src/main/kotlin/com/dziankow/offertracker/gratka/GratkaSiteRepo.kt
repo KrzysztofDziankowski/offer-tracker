@@ -9,63 +9,79 @@ import org.jsoup.Jsoup
 import java.net.URL
 import java.util.regex.Pattern
 
-class GratkaSiteRepo(override var urlSearchContext: String = "", var baseUrlStr: String = "https://gratka.pl"): SiteRepo("gratka", URL(baseUrlStr), urlSearchContext) {
+class GratkaSiteRepo(override var urlSearchContext: String = "", var baseUrlStr: String = "https://gratka.pl"):
+        SiteRepo("gratka", URL(baseUrlStr), urlSearchContext) {
+
+    private val offerIdPattern = Pattern.compile("offerId: ([0-9]*)")
+    private val companyPattern = Pattern.compile("\"company\": \"([^\"]*)\"")
+
     override fun hasNextPage(html: String): Boolean {
         val doc = Jsoup.parse(html)
-        return doc?.getElementsByClass("stronaNastepna")?.first() != null
+        return doc?.getElementsByClass("pagination__nextPage")?.first() != null
     }
 
     override fun getNextPageLink(html: String): String {
         val doc = Jsoup.parse(html)
-        val href = doc?.getElementsByClass("stronaNastepna")?.first()
+        val href = doc?.getElementsByClass("pagination__nextPage")?.first()
                 ?.getElementsByTag("a")?.first()?.attr("href")
                 ?: throw ElementNotFoundException()
-        val rssLink = doc?.getElementsByTag("link")
-                ?.attr("rel", "alternate")
-                ?.eachAttr("href")
-                ?.filter { it.startsWith(baseUrl.toExternalForm()) && it.contains("/rss/") }
-                ?.first()
-                ?: throw ElementNotFoundException()
-        val urlContext = rssLink.subSequence(baseUrl.toExternalForm().length, rssLink.indexOf("/rss/") + 1)
-        return "${baseUrl.toExternalForm()}${urlContext}${href}"
+        return "${baseUrl.toExternalForm()}${href}"
     }
 
-    override fun offerFromPage(html: String, offerDir: String): Offer {
+    override fun offerFromPage(html: String, repoLink: String, offerDir: String): Offer {
         val doc = Jsoup.parse(html)
 
-        val sellerHtml = doc?.getElementById("dane-kontaktowe")?.html()
+        val sellerHtml = doc?.getElementById("contact-container")?.html()
                 ?: throw ElementNotFoundException()
-        val sellerName = doc?.getElementById("dane-kontaktowe")
-                ?.getElementsByClass("nazwaFirmy")?.text()
-                ?: throw ElementNotFoundException()
+        val sellerName = doc?.getElementById("leftColumn")?.select("script")
+                ?.map { val matcher = companyPattern.matcher(it.html())
+                    if (matcher.find()) {
+                        matcher.group(1)
+                    } else {
+                        null
+                    }
+                }?.filter { it != null }?.firstOrNull() ?: "UNKNOWN"
 
         val seller = Seller(name = sellerName, html = sellerHtml)
 
-        val offerDoc = doc?.getElementById("dane-podstawowe")
+        val offerDoc = doc?.getElementById("rightColumn")
                 ?: throw ElementNotFoundException()
-        val offerDescription = offerDoc.getElementsByClass("opis").first()?.html()
+        val offerDescription = doc.getElementsByClass("description__container").first()?.html()
                 ?: throw ElementNotFoundException()
-        val offerHtml = offerDoc.html()
+        val offerHtml = offerDoc?.html()
                 ?: throw ElementNotFoundException()
-        val offerName = doc.getElementById("karta-naglowek").getElementsByTag("h1").first()?.text()
+        val offerName = offerDoc?.getElementsByClass("sticker__title")?.first()?.text()
                 ?: throw ElementNotFoundException()
-        val offerPrice = doc.getElementsByClass("cenaGlowna")?.first()
-                ?.getElementsByTag("b")?.first()?.text()?.replace(" ", "")?.toInt()
+        val offerPriceTmp = offerDoc.getElementsByClass("sticker__value")?.first()
+                ?.text()
+                ?.replace(" ", "")
                 ?: throw ElementNotFoundException()
+        val offerPrice = offerPriceTmp.substring(0, offerPriceTmp.indexOf(",")).toInt()
 
-        val offerParameters = HashMap<String, String>()
-        offerDoc.getElementsByClass("label").forEach {
-            val valueElement = it.parent().getElementsByClass("wartosc").first()
-            if (valueElement != null) {
-                offerParameters.put(it.text(), valueElement.text())
-            }
-        }
-        val offerNumber = offerParameters.get("Numer oferty")
-                ?: throw ElementNotFoundException()
-        val offerArea = (offerParameters.get("Powierzchnia") ?: throw ElementNotFoundException())
-                .replace(" ", "")
-                .replace(",", ".")
-                .substringBefore("m").toDouble()
+        val offerParameters = offerDoc?.getElementsByClass("parameters__container")?.first()
+                ?.getElementsByClass("parameters__rolled")?.first()
+                ?.getElementsByTag("li")
+                ?.filter{
+                    val valueHasText = it.getElementsByClass("parameters__value")?.first()?.hasText() ?: false
+                    val keyHasText = it.children()?.first()?.hasText() ?: false
+                    valueHasText && keyHasText
+                }?.map {
+            val valueText = it.getElementsByClass("parameters__value")?.first()?.text() ?: ""
+            val keyText = it.children()?.first()?.text() ?: ""
+            keyText to valueText
+        }?.toMap() ?: throw ElementNotFoundException()
+
+
+        val offerNumber = doc?.getElementById("leftColumn")?.select("script")
+                ?.map { val matcher = offerIdPattern.matcher(it.html())
+                    if (matcher.find()) {
+                        matcher.group(1)
+                    } else {
+                        null
+                    }
+                }?.filter { it != null }?.first() ?: throw ElementNotFoundException()
+        val offerArea = (offerParameters.get("Powierzchnia w m2") ?: throw ElementNotFoundException())
+                .toDouble()
 
         var offerExternalLink = ""
         val externalLinkIdx = offerDescription.lastIndexOf("::LINK DO STRONY")
@@ -129,6 +145,7 @@ class GratkaSiteRepo(override var urlSearchContext: String = "", var baseUrlStr:
                 price = offerPrice,
                 repoName = repoName,
                 repoId = offerNumber,
+                repoLink = repoLink,
                 externalId = offerExternalId,
                 description = offerDescription,
                 parameters = offerParameters,
@@ -144,10 +161,9 @@ class GratkaSiteRepo(override var urlSearchContext: String = "", var baseUrlStr:
 
     override fun getOfferLinksFromPage(html: String): List<String> {
         val doc = Jsoup.parse(html)
-        return doc?.getElementsByClass("ogloszenie")?.map {
-            val link = it.getElementsByTag("a").first()
-            val href = link.attr("href")
-            "${baseUrl.toExternalForm()}${href}"
-        }?.toList() ?: throw ElementNotFoundException()
+        return doc?.getElementById("leftColumn")?.getElementsByClass("teaser")?.map {
+            val href = it.attr("href")
+            "${href}"
+        }?.toList() ?: ArrayList()
     }
 }

@@ -7,7 +7,6 @@ import org.junit.Assert.*
 import org.junit.Test
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import javax.persistence.NoResultException
 
 
 class DbModelsTest() {
@@ -26,7 +25,7 @@ class DbModelsTest() {
                 repoId = "repoId-$suffix",
                 externalId = "externalId-$suffix",
                 area = 20.0,
-                dateReadFromRepo = dateReadFromRepo,
+                repoDate = dateReadFromRepo,
                 description = "description-$suffix",
                 externalLink = "",
                 parameters = parameters,

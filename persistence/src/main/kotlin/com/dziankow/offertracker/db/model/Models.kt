@@ -17,11 +17,12 @@ data class OfferEntity(
         val price: Int = 0,
         val repoName: String = "",
         val repoId: String = "",
+        val repoLink: String = "",
         val externalId: String = "",
         val area: Double = 0.0,
         @Lob
         val description: String = "",
-        val dateReadFromRepo: LocalDateTime = LocalDateTime.now(),
+        val repoDate: LocalDateTime = LocalDateTime.now(),
         val externalLink: String = "",
         @ElementCollection
         val parameters: Map<String, String>? = null,

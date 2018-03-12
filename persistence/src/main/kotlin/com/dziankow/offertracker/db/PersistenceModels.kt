@@ -93,7 +93,7 @@ internal class PersistenceModels(val persistenceUnitName: String = "file", val f
         try {
             entityManager.transaction.begin()
             return Optional.of(entityManager.createQuery(
-                    "SELECT o FROM ${clazz.name} o WHERE o.repoId = :repoId AND o.externalId = :externalId ORDER BY o.dateReadFromRepo DESC", clazz)
+                    "SELECT o FROM ${clazz.name} o WHERE o.repoId = :repoId AND o.externalId = :externalId ORDER BY o.repoDate DESC", clazz)
                     .setParameter("repoId", repoId)
                     .setParameter("externalId", externalId)
                     .setMaxResults(1)

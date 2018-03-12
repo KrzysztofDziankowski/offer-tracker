@@ -1,5 +1,6 @@
 siteRepos:
   - gratka:
-      "urlSearchContext": "mieszkania-sprzedam/lista/kujawsko-pomorskie,,4000000,co.html"
+      "baseUrlStr": "https://gratka.pl"
+      "urlSearchContext": "nieruchomosci/mieszkania?cena-calkowita:min=600000000"
 database:
-  fileName: ~/.offertracker/offertracker2
+  fileName: ~/.offertracker/offertracker

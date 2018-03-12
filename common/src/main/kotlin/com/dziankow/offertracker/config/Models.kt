@@ -1,7 +1,6 @@
 package com.dziankow.offertracker.config
 
 import com.dziankow.offertracker.utils.getAndSaveImage
-import jdk.nashorn.internal.codegen.OptimisticTypesPersistence
 import java.time.LocalDateTime
 
 interface ContentComparable<T> {
@@ -11,18 +10,19 @@ interface ContentComparable<T> {
 data class Offer(
         val persistenceId: Long? = null,
         val name: String,
-        val offerInRepo: Boolean,
         val price: Int,
         val repoName: String,
         val repoId: String,
+        val repoLink: String,
+        val repoDate: LocalDateTime = LocalDateTime.now(),
         val externalId: String,
+        val externalLink: String,
         val area: Double,
         val description: String,
-        val dateReadFromRepo: LocalDateTime = LocalDateTime.now(),
-        val externalLink: String,
         val parameters: Map<String, String>,
         val imageUrlList: List<String>,
         val html: String,
+        val offerInRepo: Boolean,
         val galacticaVirgo: Boolean,
         val offerDir: String,
         val seller: Seller
@@ -32,6 +32,7 @@ data class Offer(
         return name == other.name
                 && price == other.price
                 && repoId == other.repoId
+                && repoLink == other.repoLink
                 && repoName == other.repoName
                 && externalId == other.externalId
                 && area == area
@@ -48,15 +49,16 @@ data class Offer(
                 "name='$name', " +
                 "price=${price}zł, " +
                 "repoId='$repoId', " +
-                "repoName='$repoName'" +
+                "repoName='$repoName', " +
                 "externalId='$externalId', " +
                 "area=${area}m2, " +
                 "description='${description.substring(0, Math.min(description.length, 10))}...', " +
-                "dateReadFromRepo= $dateReadFromRepo, " +
+                "repoDate= $repoDate, " +
                 "externalLink=$externalLink, " +
                 "imageUrlList=$imageUrlList, " +
                 "galacticaVirgo=$galacticaVirgo, " +
                 "offerDir=$offerDir, " +
+                "repoLink=$repoLink, " +
                 "parameters=$parameters, seller=$seller)"
     }
 

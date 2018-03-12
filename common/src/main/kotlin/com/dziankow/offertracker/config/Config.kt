@@ -33,7 +33,7 @@ abstract class SiteRepo(val repoName: String,
         get() {return "data/${repoName}"}
 
     abstract fun getOfferLinksFromPage(html: String): List<String>
-    abstract fun offerFromPage(html: String, offerDir: String): Offer
+    abstract fun offerFromPage(html: String, repoLink: String, offerDir: String): Offer
     abstract fun hasNextPage(html: String): Boolean
     abstract fun getNextPageLink(html: String): String
 
@@ -48,7 +48,7 @@ abstract class SiteRepo(val repoName: String,
             val offerDir = "$dataDir/$offerName"
             // just for debugging
             saveFile("$offerDir/$offerName", offerHtml)
-            val offer = offerFromPage(offerHtml, offerDir)
+            val offer = offerFromPage(offerHtml, offerLink, offerDir)
             offerList.add(offer)
         }
         return offerList

@@ -24,7 +24,7 @@ class DbMappersTest() {
                 repoId = "repoId-$suffix",
                 externalId = "externalId-$suffix",
                 area = 20.0,
-                dateReadFromRepo = dateReadFromRepo,
+                repoDate = dateReadFromRepo,
                 description = "description-$suffix",
                 externalLink = "",
                 parameters = parameters,
